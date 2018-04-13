@@ -24,6 +24,13 @@ pub use self::cross::{
     draw_cross_mut
 };
 
+mod canvas;
+pub use self::canvas::{
+    Blend,
+    PixelCanvas,
+    Overwrite,
+};
+
 mod line;
 pub use self::line::{
     BresenhamLineIter,
