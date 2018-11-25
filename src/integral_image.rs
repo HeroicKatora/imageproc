@@ -249,23 +249,20 @@ pub fn row_running_sum(image: &GrayImage, row: u32, buffer: &mut [u32], padding:
     );
 
     unsafe {
-        let mut sample_ptr: *const u8 = std::mem::transmute(image.get_pixel(0, row));
         let mut sum = 0;
 
-        let initial = (*sample_ptr) as u32;
+        let initial = *image.unsafe_get_sample(0, 0, row) as u32;
         for x in 0..padding {
             sum += initial;
             *buffer.get_unchecked_mut(x as usize) = sum;
         }
 
         for x in 0..width {
-            sum += (*sample_ptr) as u32;
-            sample_ptr = sample_ptr.offset(1);
+            sum += *image.unsafe_get_sample(0, x, row) as u32;
             *buffer.get_unchecked_mut((x + padding) as usize) = sum;
         }
 
-        sample_ptr = sample_ptr.offset(-1);
-        let finals = (*sample_ptr) as u32;
+        let finals = *image.unsafe_get_sample(0, width - 1, row) as u32;
         for x in 0..padding {
             sum += finals;
             *buffer.get_unchecked_mut((x + width + padding) as usize) = sum;

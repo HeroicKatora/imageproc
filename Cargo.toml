@@ -10,7 +10,7 @@ exclude = ["examples/*.ttf"]
 
 [dependencies]
 conv = "0.3.1"
-image = "0.20.0"
+image = { path = "../image/" }
 itertools = "0.7.0"
 num = "0.2.0"
 quickcheck = "0.6"
