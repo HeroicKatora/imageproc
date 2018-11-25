@@ -243,21 +243,31 @@ pub fn row_running_sum(image: &GrayImage, row: u32, buffer: &mut [u32], padding:
         row < height,
         format!("row out of bounds: {} >= {}", row, height)
     );
+    assert!(
+        0 < width,
+        "Running row sum of zero width images is nonsense"
+    );
 
     unsafe {
+        let mut sample_ptr: *const u8 = std::mem::transmute(image.get_pixel(0, row));
         let mut sum = 0;
+
+        let initial = (*sample_ptr) as u32;
         for x in 0..padding {
-            sum += image.unsafe_get_pixel(0, row)[0] as u32;
+            sum += initial;
             *buffer.get_unchecked_mut(x as usize) = sum;
         }
 
         for x in 0..width {
-            sum += image.unsafe_get_pixel(x, row)[0] as u32;
+            sum += (*sample_ptr) as u32;
+            sample_ptr = sample_ptr.offset(1);
             *buffer.get_unchecked_mut((x + padding) as usize) = sum;
         }
 
+        sample_ptr = sample_ptr.offset(-1);
+        let finals = (*sample_ptr) as u32;
         for x in 0..padding {
-            sum += image.unsafe_get_pixel(width - 1, row)[0] as u32;
+            sum += finals;
             *buffer.get_unchecked_mut((x + width + padding) as usize) = sum;
         }
     }
