@@ -441,9 +441,19 @@ mod test {
 
     #[bench]
     fn bench_row_running_sum(b: &mut test::Bencher) {
-        let image = gray_bench_image(1000, 1);
-        let mut buffer = [0; 1010];
-        b.iter(|| { row_running_sum(&image, 0, &mut buffer, 5); });
+        // ~10^5 additions – 10-4s runtime to keep variance a bit lower.
+        let image = gray_bench_image(1 << 15, 1);
+        let mut buffer = [0; (1 << 15) + 2];
+        b.iter(|| { row_running_sum(&image, 0, &mut buffer, 1); });
+    }
+
+    #[bench]
+    fn bench_row_running_sum_radius(b: &mut test::Bencher) {
+        // ~10^5 additions – 10-4s runtime to keep variance a bit lower.
+        // But also make the image larger than a single cache line.
+        let image = gray_bench_image(1 << 10, 1);
+        let mut buffer = [0; (1 << 10) + (1 << 15)];
+        b.iter(|| { row_running_sum(&image, 0, &mut buffer, 1 << 14); });
     }
 
     #[bench]
